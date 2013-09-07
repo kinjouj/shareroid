@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<cronentries>
+    <cron>
+        <url>/cron/cleanup</url>
+        <description>cleanup entries</description>
+        <timezone>Asia/Tokyo</timezone>
+        <schedule>every monday of month 06:00</schedule>
+    </cron>
+</cronentries>

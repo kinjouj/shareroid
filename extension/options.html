@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>オプション</title>
+    <script type="text/javascript" src="lib/js/jquery.js"></script>
+    <script type="text/javascript" src="lib/js/underscore.js"></script>
+    <script type="text/javascript" src="lib/js/chrome_ex_oauth.js"></script>
+    <script type="text/javascript" src="lib/js/chrome_ex_oauthsimple.js"></script>
+    <script type="text/javascript" src="const.js"></script>
+    <script type="text/javascript" src="share.js"></script>
+    <script type="text/javascript" src="shareroid.js"></script>
+  </head>
+  <body>
+    <div style="float: right">
+      <button id="sync_btn">同期する</button>
+    </div>
+    <div id="history_block" style="clear: both;display:none;margin-top: 30px">
+      <h2>履歴</h2>
+      <table style="width: 800px">
+        <thead>
+          <tr>
+            <th style="width: 40%">日付</th>
+            <th style="width: 60%">URL</th>
+          </tr>
+        </thead>
+        <tbody id="histories">
+        </tbody>
+      </table>
+    </div>
+    <script type="text/javascript" src="options.js"></script>
+  </body>
+</html>

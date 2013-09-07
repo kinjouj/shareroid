@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<resources>
+    <string name="notification_ticker">通知しました</string>
+    <string name="notification_message">%1$s を通知しました</string>
+</resources>

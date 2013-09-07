@@ -1,0 +1,9 @@
+.gradle
+.classpath
+.factorypath
+.project
+.settings
+target
+www-test
+war
+*.log
