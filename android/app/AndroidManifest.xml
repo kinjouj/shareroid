@@ -38,5 +38,13 @@
                 <data android:scheme="shareroid" android:host="oauth" android:path="/callback" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".BootCompletedBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".ReadService" />
     </application>
 </manifest>

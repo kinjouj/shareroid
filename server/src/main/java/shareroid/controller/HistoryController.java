@@ -8,7 +8,7 @@ public class HistoryController extends ShareController {
         protectOAuthRequest();
 
         if (isGet()) {
-            String json = service.modelsToJson(service.getHistory());
+            String json = service.modelsToJson(service.getHistories());
             renderJSON(json);
         } else {
             sendError();

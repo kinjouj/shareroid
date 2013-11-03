@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import mockit.Expectations;
-import mockit.Mocked;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.slim3.controller.ControllerConstants;
@@ -17,13 +14,11 @@ import org.slim3.datastore.ModelQuery;
 import org.slim3.tester.AppEngineTestCase;
 import org.slim3.util.ApplicationMessage;
 
-import com.google.appengine.api.users.UserServiceFactory;
-
 import shareroid.model.Share;
 import shareroid.service.ShareService;
-
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
+import static shareroid.model.Direction.CHROME;
 
 public class ShareServiceTest extends AppEngineTestCase {
 
@@ -34,42 +29,33 @@ public class ShareServiceTest extends AppEngineTestCase {
         super.setUp();
         service = new ShareService();
 
-        Share share1 = new Share();
-        share1.setUrl("http://localhost:8080");
-
-        Share share2 = new Share();
-        share2.setUrl("https://localhost:8080");
-        share2.setPublished(true);
-
-        Datastore.put(share1, share2);
-
         ApplicationMessage.setBundle(
             ControllerConstants.DEFAULT_LOCALIZATION_CONTEXT,
             new Locale("en")
         );
+
+        Share share1 = new Share();
+        share1.setUrl("http://localhost:8080");
+        share1.setDirection(CHROME);
+
+        Share share2 = new Share();
+        share2.setUrl("https://localhost:8080");
+        share2.setPublished(true);
+        share2.setDirection(CHROME);
+
+        Datastore.put(share1, share2);
     }
 
     @Test
     public void test_getShares() {
-        List<Share> shares = service.getShares();
+        List<Share> shares = service.getSharesByDirection(CHROME);
         assertThat(shares, hasSize(1));
     }
 
     @Test
     public void test_getHistory() {
-        List<Share> shares = service.getHistory();
+        List<Share> shares = service.getHistories();
         assertThat(shares, hasSize(1));
-    }
-
-    @Test
-    public void test_validate() {
-        assertThat(service.validate(null), is(false));
-
-        Map<String, Object> request = new HashMap<String, Object>();
-        assertThat(service.validate(request), is(false));
-
-        request.put("url", "http://localhost:8080");
-        assertThat(service.validate(request), is(true));
     }
 
     @Test
@@ -80,21 +66,29 @@ public class ShareServiceTest extends AppEngineTestCase {
         assertThat(service.save(request), is(false));
 
         request.put("url", "http://localhost:8080");
+        request.put("direction", CHROME);
+
         assertThat(service.save(request), is(true));
-        assertThat(service.getShares(), hasSize(2));
-        assertThat(service.getHistory(), hasSize(3));
+
+        List<Share> shares = service.getSharesByDirection(CHROME);
+        assertThat(shares, hasSize(2));
+        assertThat(service.getHistories(), hasSize(3));
+
+        for (Share share : shares) {
+            System.out.println("direction: " + share.getDirection().name());
+        }
     }
 
     @Test
     public void test_cleanup() {
-        assertThat(service.getHistory(), hasSize(1));
+        assertThat(service.getHistories(), hasSize(1));
         service.cleanup();
-        assertThat(service.getHistory(), hasSize(0));
+        assertThat(service.getHistories(), hasSize(0));
     }
 
     @Test
     public void test_modelsToJson() {
-        List<Share> shares = service.getShares();
+        List<Share> shares = service.getSharesByDirection(CHROME);
         assertThat(shares, hasSize(1));
         assertThat(service.modelsToJson(shares), notNullValue());
         assertThat(service.modelsToJson(null), nullValue());

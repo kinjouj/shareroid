@@ -7,7 +7,6 @@ import org.slim3.datastore.Datastore;
 import shareroid.controller.cron.CleanupController;
 import shareroid.controller.test.AbstractControllerTestCase;
 import shareroid.model.Share;
-
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -16,6 +15,8 @@ public class CleanupControllerTest extends AbstractControllerTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        tester.environment.setAdmin(true);
+        tester.environment.setEmail("admin@gmail.com");
 
         Share share = new Share();
         share.setUrl("http://localhost:8080");
@@ -30,9 +31,9 @@ public class CleanupControllerTest extends AbstractControllerTestCase {
 
         start("/cron/cleanup");
 
-        assertThat(getStatus(), is(200));
         assertThat(getController(), instanceOf(CleanupController.class));
         assertThat(entryCount(), is(0));
+        assertThat(getStatus(), is(200));
     }
 
     @Test

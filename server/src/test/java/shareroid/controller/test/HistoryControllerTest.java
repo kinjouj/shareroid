@@ -1,13 +1,8 @@
 package shareroid.controller.test;
 
-import mockit.Expectations;
-import mockit.Mocked;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.slim3.datastore.Datastore;
-
-import com.google.appengine.api.oauth.OAuthServiceFactory;
 
 import shareroid.controller.HistoryController;
 import shareroid.model.Share;
@@ -31,6 +26,7 @@ public class HistoryControllerTest extends AbstractControllerTestCase {
     public void test_run() throws Exception {
         initOAuthService();
         start("/history");
+
         assertThat(getController(), instanceOf(HistoryController.class));
         assertThat(getStatus(), is(200));
         assertThat(getContentType(), is("application/json; charset=utf-8"));
@@ -45,19 +41,9 @@ public class HistoryControllerTest extends AbstractControllerTestCase {
 
     @Test
     public void test_run_method_isnt_get() throws Exception {
-        new Expectations() {
-
-            @Mocked(methods = "getOAuthService")
-            final OAuthServiceFactory factory = null;
-
-            {
-                OAuthServiceFactory.getOAuthService();
-                times = 1;
-                result = new MockOAuthService();
-            }
-        };
-
+        initOAuthService();
         start("/history", "POST");
+
         assertThat(getStatus(), is(400));
     }
 }

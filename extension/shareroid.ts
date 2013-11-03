@@ -47,7 +47,7 @@ class Shareroid {
     var d = $.Deferred();
 
     this.oauth.sendSignedRequest(
-      'https://shareroid.appspot.com/read',
+      'https://shareroid.appspot.com/read/chrome',
       (data) : void => {
         d.resolve(JSON.parse(data));
       }
@@ -67,6 +67,20 @@ class Shareroid {
     );
 
     return d.promise();
+  }
+
+  send(url) : void {
+
+    this.oauth.sendSignedRequest(
+      'https://shareroid.appspot.com/push/android',
+      (data, xhr) : void => {
+        console.log(xhr.status);
+      },
+      {
+        "method": "POST",
+        "parameters": { "url": url }
+      }
+    );
   }
 
   addAlarmListener(name : string, options : Object, callback : (alarm : any) => void) : void {

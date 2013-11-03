@@ -19,6 +19,18 @@ var BackgroundPage = (function () {
                 }
             });
         });
+
+        chrome.contextMenus.create({
+            "id": "shareroid_ctxmenu",
+            "title": "shareroid",
+            "type": "normal",
+            "contexts": ["page"]
+        });
+
+        chrome.contextMenus.onClicked.addListener(function (info, tab) {
+            var url = info.pageUrl;
+            shareroid.send(url);
+        });
     };
     return BackgroundPage;
 })();

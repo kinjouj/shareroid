@@ -23,6 +23,9 @@ public class Share {
     @Json(ignore = true)
     private boolean published;
 
+    @Json(ignore = false)
+    private Direction direction;
+
     @Attribute(listener = CreationDate.class)
     private Date createdAt;
 
@@ -52,6 +55,14 @@ public class Share {
 
     public void setPublished(boolean published) {
         this.published = published;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     public Date getCreatedAt() {

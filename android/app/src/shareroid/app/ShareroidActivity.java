@@ -51,7 +51,7 @@ public class ShareroidActivity extends OAuthActivity {
         finish();
     }
 
-    private String getQuery(Intent intent) {
+    String getQuery(Intent intent) {
         String url = null;
 
         if (intent != null) {

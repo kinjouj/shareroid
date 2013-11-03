@@ -24,7 +24,7 @@ public class MockOAuthService implements OAuthService {
     
     @Override
     public User getCurrentUser(String arg0) throws OAuthRequestException {
-        return null;
+        return getCurrentUser();
     }
     
     @Override

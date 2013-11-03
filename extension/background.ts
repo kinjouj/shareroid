@@ -26,6 +26,18 @@ class BackgroundPage {
         }
       });
     });
+
+    chrome.contextMenus.create({
+      "id": "shareroid_ctxmenu",
+      "title": "shareroid",
+      "type": "normal",
+      "contexts": ["page"]
+    });
+
+    chrome.contextMenus.onClicked.addListener((info, tab) : void => {
+      var url = info.pageUrl;
+      shareroid.send(url);
+    });
   }
 }
 

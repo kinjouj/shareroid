@@ -24,7 +24,7 @@ sourceSets {
     }
 
     test {
-        output.classesDir = "${buildDir}/classes"
+        output.classesDir = "${buildDir}/test-classes"
     }
 
     apt
@@ -154,5 +154,13 @@ eclipse {
                 entry.kind == "output"
             }*.path = "/${project.name}/${targetDir}/classes"
         }
+    }
+}
+
+war {
+    from(sourceSets.main.runtimeClasspath) {
+        into "WEB-INF/classes"
+        include "**/*.class"
+        exclude "**/*Test.class"
     }
 }

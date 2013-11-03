@@ -23,8 +23,6 @@ public abstract class ShareController extends Controller {
         if (!oauthService.isUserAdmin()) {
             throw new OAuthRequestException("unauthorized");
         }
-
-        System.out.println(oauthService.getCurrentUser());
     }
 
     protected void sendError() throws IOException {
@@ -36,6 +34,7 @@ public abstract class ShareController extends Controller {
             throw new IllegalArgumentException("json is empty");
         }
 
+        response.setStatus(200);
         response.setContentType("application/json; charset=utf-8");
         response.setContentLength(json.length());
         response.getWriter().print(json);
@@ -43,7 +42,10 @@ public abstract class ShareController extends Controller {
 
     @Override
     protected Navigation handleError(Throwable error) throws Throwable {
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, error.getMessage());
+        response.sendError(
+            HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            error.getMessage()
+        );
 
         return null;
     }

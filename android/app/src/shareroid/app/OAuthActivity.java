@@ -32,6 +32,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import static shareroid.app.Constants.*;
 
 public abstract class OAuthActivity extends Activity {
@@ -41,20 +42,27 @@ public abstract class OAuthActivity extends Activity {
         OAUTH_CONSUMER_SECRET
     );
 
-    protected String acquireRequestToken(String query) throws OAuthMessageSignerException, OAuthNotAuthorizedException, OAuthExpectationFailedException, OAuthCommunicationException {
+    String acquireRequestToken(String query) throws OAuthMessageSignerException, OAuthNotAuthorizedException, OAuthExpectationFailedException, OAuthCommunicationException {
+        if (TextUtils.isEmpty(query))
+            throw new IllegalArgumentException("query is an empty");
+
+        System.out.println(getProvider());
+
         return getProvider().retrieveRequestToken(
             consumer,
             OAUTH_CALLBACK + "?query=" + query
         );
     }
 
-    protected void acquireAccessToken(String verifier) throws OAuthMessageSignerException, OAuthNotAuthorizedException, OAuthExpectationFailedException, OAuthCommunicationException {
+    protected boolean acquireAccessToken(String verifier) throws OAuthMessageSignerException, OAuthNotAuthorizedException, OAuthExpectationFailedException, OAuthCommunicationException {
         getProvider().retrieveAccessToken(consumer, verifier);
         getSharedPreferences()
             .edit()
             .putString(PREFERENCE_KEY_OAUTH_TOKEN, consumer.getToken())
             .putString(PREFERENCE_KEY_OAUTH_TOKEN_SECRET, consumer.getTokenSecret())
             .commit();
+
+        return true;
     }
 
     protected boolean isAuthorized() {
@@ -71,7 +79,7 @@ public abstract class OAuthActivity extends Activity {
             List<NameValuePair> params = new ArrayList<NameValuePair>(1);
             params.add(new BasicNameValuePair("url", query));
 
-            HttpPost request = new HttpPost("https://shareroid.appspot.com/push");
+            HttpPost request = new HttpPost("https://shareroid.appspot.com/push/chrome");
             request.setEntity(new UrlEncodedFormEntity(params));
 
             consumer.setTokenWithSecret(getTokenByPreference(), getTokenSecretByPreference());
@@ -117,7 +125,7 @@ public abstract class OAuthActivity extends Activity {
         }
     }
 
-    private OAuthProvider getProvider() {
+    public OAuthProvider getProvider() {
         return new CommonsHttpOAuthProvider(
             BASE_URL + "/_ah/OAuthGetRequestToken",
             BASE_URL + "/_ah/OAuthGetAccessToken",

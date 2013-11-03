@@ -27,7 +27,7 @@ var Shareroid = (function () {
     Shareroid.prototype.fetchEntries = function () {
         var d = $.Deferred();
 
-        this.oauth.sendSignedRequest('https://shareroid.appspot.com/read', function (data) {
+        this.oauth.sendSignedRequest('https://shareroid.appspot.com/read/chrome', function (data) {
             d.resolve(JSON.parse(data));
         });
 
@@ -42,6 +42,15 @@ var Shareroid = (function () {
         });
 
         return d.promise();
+    };
+
+    Shareroid.prototype.send = function (url) {
+        this.oauth.sendSignedRequest('https://shareroid.appspot.com/push/android', function (data, xhr) {
+            console.log(xhr.status);
+        }, {
+            "method": "POST",
+            "parameters": { "url": url }
+        });
     };
 
     Shareroid.prototype.addAlarmListener = function (name, options, callback) {

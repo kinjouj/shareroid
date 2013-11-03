@@ -5,8 +5,8 @@ import org.junit.Test;
 import org.slim3.datastore.Datastore;
 
 import shareroid.controller.ReadController;
+import shareroid.model.Direction;
 import shareroid.model.Share;
-
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
@@ -16,22 +16,26 @@ public class ReadControllerTest extends AbstractControllerTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        Share share = new Share();
-        share.setUrl("http://localhost:8080");
+        Share share1 = new Share();
+        share1.setUrl("http://localhost:8080");
+        share1.setDirection(Direction.CHROME);
 
-        Datastore.put(share);
+        Share share2 = new Share();
+        share2.setUrl("http://localhost:8080");
+        share2.setDirection(Direction.ANDROID);
+
+        Datastore.put(share1, share2);
     }
 
     @Test
     public void test_run() throws Exception {
-        assertThat(entryCount(), is(1));
-
         initOAuthService();
+        setParameter("direction", Direction.CHROME.toString());
         start("/read");
+
         assertThat(getController(), instanceOf(ReadController.class));
         assertThat(getStatus(), is(200));
         assertThat(getContentType(), is("application/json; charset=utf-8"));
-        assertThat(entryCount(), is(0));
 
         Share[] shares = meta.jsonToModels(getOutputAsString());
         assertThat(shares.length, is(1));
@@ -46,11 +50,5 @@ public class ReadControllerTest extends AbstractControllerTestCase {
         initOAuthService();
         start("/read", "POST");
         assertThat(getStatus(), is(400));
-    }
-
-    @Override
-    protected int entryCount() {
-        query = query.filter(meta.published.equal(false));
-        return super.entryCount();
     }
 }

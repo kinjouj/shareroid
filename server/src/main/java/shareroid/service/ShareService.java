@@ -15,51 +15,52 @@ import com.google.appengine.api.oauth.OAuthServiceFactory;
 import com.google.appengine.api.users.User;
 
 import shareroid.meta.ShareMeta;
+import shareroid.model.Direction;
 import shareroid.model.Share;
 
 public class ShareService {
 
-    private static final ShareMeta meta = ShareMeta.get();
+    private ShareMeta meta = ShareMeta.get();
 
-    public List<Share> getShares() {
-        List<Share> shares = getQuery(false)
-            .filter(meta.user.equal(getCurrentUser()))
-            .asList();
-
-        for (Share share : shares) {
-            share.setPublished(true);
-            Datastore.putAsync(share);
+    public List<Share> getSharesByDirection(Direction direction) {
+        List<Share> shares = null;
+        
+        if (direction != null) {
+            shares = getQuery(false)
+                .filter(meta.user.equal(getCurrentUser()))
+                .filter(meta.direction.equal(direction))
+                .asList();
+    
+            for (Share share : shares) {
+                share.setPublished(true);
+                Datastore.putAsync(share);
+            }
         }
 
         return shares;
     }
 
-    public List<Share> getHistory() {
+    public List<Share> getHistories() {
         return getQuery(true)
             .filter(meta.user.equal(getCurrentUser()))
             .sort(meta.createdAt.desc)
             .asList();
     }
 
-    public boolean validate(Map<String, Object> request) {
+    public boolean save(Map<String, Object> request) {
         if (request != null) {
             Validators v = new Validators(request);
             v.add(meta.url, v.required());
-
-            return v.validate();
-        }
-
-        return false;
-    }
-
-    public boolean save(Map<String, Object> request) {
-        if (validate(request)) {
-            Share share = new Share();
-            BeanUtil.copy(request, share);
-
-            Datastore.putAsync(share);
-
-            return true;
+            v.add(meta.direction, v.required());
+    
+            if (v.validate()) {
+                Share share = new Share();
+                BeanUtil.copy(request, share);
+    
+                Datastore.put(share);
+    
+                return true;
+            }
         }
 
         return false;
@@ -67,7 +68,7 @@ public class ShareService {
 
     public void cleanup() {
         List<Key> keys = getQuery(true).asKeyList();
-        Datastore.deleteAsync(keys);
+        Datastore.delete(keys);
     }
 
 

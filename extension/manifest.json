@@ -15,10 +15,11 @@
       "share.js",
       "shareroid.js",
       "background.js"
-    ]
+    ],
+    "persistent": false
   },
   "options_page": "options.html",
-  "permissions": ["alarms", "tabs", "notifications", "https://*/*"],
+  "permissions": ["contextMenus", "alarms", "tabs", "notifications", "https://*/*"],
   "web_accessible_resources": ["img/icon_48.png"],
   "content_security_policy": "script-src 'self' 'unsafe-eval';object-src 'self'"
 }
