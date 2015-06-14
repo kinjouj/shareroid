@@ -1,2 +1,3 @@
-const.js
-libcov
+node_modules
+src/secret.js
+background.js

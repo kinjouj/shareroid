@@ -1,25 +1,19 @@
 {
   "name": "shareroid",
-  "version": "0.1",
+  "version": "0.0.2",
   "manifest_version": 2,
   "browser_action": {
     "default_icon": "img/icon_18.png"
   },
   "background": {
-    "scripts": [
-      "lib/js/jquery.js",
-      "lib/js/underscore.js",
-      "lib/js/chrome_ex_oauth.js",
-      "lib/js/chrome_ex_oauthsimple.js",
-      "const.js",
-      "share.js",
-      "shareroid.js",
-      "background.js"
-    ],
+    "scripts": ["background.js"],
     "persistent": false
   },
-  "options_page": "options.html",
-  "permissions": ["contextMenus", "alarms", "tabs", "notifications", "https://*/*"],
-  "web_accessible_resources": ["img/icon_48.png"],
-  "content_security_policy": "script-src 'self' 'unsafe-eval';object-src 'self'"
+  "permissions": [
+    "identity",
+    "alarms",
+    "notifications",
+    "tabs",
+    "https://shareroid.appspot.com/"
+  ]
 }

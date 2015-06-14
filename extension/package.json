@@ -1,0 +1,19 @@
+{
+  "name": "shareroid",
+  "version": "0.0.2",
+  "dependencies": {
+    "db.js": "^0.10.1",
+    "superagent": "^1.2.0"
+  },
+  "devDependencies": {
+    "babelify": "^6.1.2"
+  },
+  "scripts": {
+    "build": "browserify -d src/background.js -o background.js"
+  },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  }
+}
