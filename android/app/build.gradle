@@ -1,0 +1,14 @@
+apply plugin: "android"
+
+dependencies {
+    compile 'io.reactivex:rxandroid:0.24.0'
+}
+
+android {
+    compileSdkVersion 8
+    buildToolsVersion "22.0.1"
+
+    lintOptions {
+        abortOnError false
+    }
+}

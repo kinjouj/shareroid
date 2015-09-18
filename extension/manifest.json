@@ -6,8 +6,7 @@
     "default_icon": "img/icon_18.png"
   },
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "scripts": ["background.js"]
   },
   "permissions": [
     "identity",

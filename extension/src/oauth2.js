@@ -1,6 +1,8 @@
 import request from "superagent"
 import {client_id, client_secret} from "./secret"
 
+global.Promise = require("bluebird");
+
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 
@@ -29,6 +31,10 @@ class AccessToken {
 
 export default class OAuth2 {
 
+  static getAccessToken() {
+    return AccessToken.getAccessToken();
+  }
+
   static authorize() {
     return new Promise((resolve, reject) => {
       OAuth2.check_token()
@@ -36,13 +42,11 @@ export default class OAuth2 {
           resolve(AccessToken.getAccessToken());
         })
         .catch((err) => {
-          console.error(err);
           OAuth2.refresh_access_token()
             .then(() => {
               resolve(AccessToken.getAccessToken());
             })
             .catch((err) => {
-              console.error(err);
               reject(err);
             });
         });
@@ -115,7 +119,7 @@ export default class OAuth2 {
 
           var { access_token } = res.body;
           AccessToken.saveAccessToken(access_token);
-          resolve();
+          resolve(AccessToken.getAccessToken());
         });
     });
   }

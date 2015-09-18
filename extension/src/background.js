@@ -1,40 +1,43 @@
-import OAuth2 from "./oauth2"
-import Shareroid from "./shareroid"
+import OAuth2 from "./oauth2";
+import Shareroid from "./shareroid";
+
+const SYNC_INTERVAL = 60;
 
 var cntObserve = Object.observe({ value: null }, (changes) => {
   changes.forEach((change) => {
-    console.info(change);
     chrome.browserAction.setBadgeText({ text: String(change.object.value) });
   });
 });
 
 function start_app(token) {
-  var shareroid = new Shareroid(token);
-  shareroid.sync();
+  let shareroid = new Shareroid();
+  shareroid.sync().then((cnt) => {
+    cntObserve.value = cnt;
+  });
+  shareroid.read();
 
-  shareroid.count().then((count) => {
-    cntObserve.value = count;
-  })
-  .catch((err) => {
-    console.error(err);
+  chrome.browserAction.onClicked.addListener(async () => {
+    let entries = await shareroid.read();
+    entries.forEach((entry) => {
+      chrome.tabs.create({ url: entry.url });
+    });
+
+    shareroid.clear();
     cntObserve.value = 0;
   });
 
-  chrome.browserAction.onClicked.addListener(() => {
-    shareroid.read().then((entries) => {
-      entries.forEach((entry) => {
-        chrome.tabs.create({ url: entry.url });
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    OAuth2.authorize().then((token) => {
+      shareroid.sync().then((cnt) => {
+        cntObserve.value = cnt;
+        (async () => {
+          let entries = await shareroid.read();
+          console.debug(entries);
+        })();
       });
-
-      shareroid.clear();
-      cntObserve.value = 0;
-    }).catch((error) => {
-      alert(error);
     });
   });
-
-  chrome.alarms.onAlarm.addListener((alarm) => shareroid.sync());
-  chrome.alarms.create("shareroid-alarm", { periodInMinutes: 30 });
+  chrome.alarms.create("shareroid-alarm", { periodInMinutes: SYNC_INTERVAL });
 }
 
 OAuth2.authorize().then((token) => {
