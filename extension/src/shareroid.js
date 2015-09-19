@@ -1,7 +1,7 @@
-import db from "db.js"
-import request from "superagent"
-import Notify from "./notify"
-import OAuth2 from "./oauth2"
+import db from "db.js";
+import request from "superagent";
+import Notify from "./notify";
+import OAuth2 from "./oauth2";
 
 export default class Shareroid {
 
@@ -21,12 +21,15 @@ export default class Shareroid {
       })
       .then((server) => {
         resolve(server);
+      })
+      .catch((err) => {
+        reject(err);
       });
     });
   }
 
   read() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       (async () => {
         let server = await this.open();
         let entries = await server.share.query().all().execute();
@@ -37,7 +40,7 @@ export default class Shareroid {
   }
 
   count() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       (async () => {
         let entries = await this.read();
         resolve(entries.length);

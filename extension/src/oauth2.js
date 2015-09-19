@@ -1,5 +1,7 @@
-import request from "superagent"
-import {client_id, client_secret} from "./secret"
+/*global chrome*/
+
+import request from "superagent";
+import {client_id, client_secret} from "./secret";
 
 global.Promise = require("bluebird");
 
@@ -40,12 +42,12 @@ export default class OAuth2 {
     return new Promise((resolve, reject) => {
       OAuth2.check_token()
         .then(() => {
-          resolve(AccessToken.token);
+          resolve();
         })
-        .catch((err) => {
+        .catch(() => {
           OAuth2.refresh_access_token()
             .then(() => {
-              resolve(AccessToken.token);
+              resolve();
             })
             .catch((err) => {
               reject(err);
@@ -92,7 +94,7 @@ export default class OAuth2 {
           var { access_token, refresh_token } = res.body;
           AccessToken.token = access_token;
           AccessToken.refreshToken = refresh_token;
-          resolve(access_token);
+          resolve();
         });
     });
   }
@@ -139,8 +141,8 @@ export default class OAuth2 {
               throw new Error("invalid code");
             }
 
-            OAuth2.get_access_token(code).then((token) => {
-              resolve(token);
+            OAuth2.get_access_token(code).then(() => {
+              resolve();
             });
           }, 1000);
         }

@@ -8,10 +8,15 @@
     "superagent": "^1.2.0"
   },
   "devDependencies": {
-    "babelify": "^6.1.2"
+    "babel-eslint": "^4.1.3",
+    "babelify": "^6.1.2",
+    "eslint": "^1.5.0",
+    "npm-run-all": "^1.2.11"
   },
   "scripts": {
-    "build": "browserify -d src/background.js -o background.js"
+    "build": "npm-run-all lint build:source",
+    "build:source": "browserify -d src/background.js -o background.js",
+    "lint": "eslint src/*.js"
   },
   "browserify": {
     "transform": [

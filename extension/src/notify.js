@@ -1,3 +1,5 @@
+/*global chrome*/
+
 export default class Notify {
   static send(id, title, message) {
     chrome.notifications.create(

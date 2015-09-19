@@ -1,3 +1,5 @@
+/*global chrome*/
+
 import OAuth2 from "./oauth2";
 import Shareroid from "./shareroid";
 
@@ -9,7 +11,7 @@ var observer = Object.observe({ value: null }, (changes) => {
   });
 });
 
-function start_app(token) {
+function start_app() {
   let shareroid = new Shareroid();
   shareroid.sync().then((cnt) => {
     observer.value = cnt;
@@ -25,8 +27,8 @@ function start_app(token) {
     observer.value = 0;
   });
 
-  chrome.alarms.onAlarm.addListener((alarm) => {
-    OAuth2.authorize().then((token) => {
+  chrome.alarms.onAlarm.addListener(() => {
+    OAuth2.authorize().then(() => {
       shareroid.sync().then((cnt) => {
         observer.value = cnt;
         (async () => {
@@ -39,15 +41,17 @@ function start_app(token) {
   chrome.alarms.create("shareroid-alarm", { periodInMinutes: SYNC_INTERVAL });
 }
 
-OAuth2.authorize().then((token) => {
+OAuth2.authorize().then(() => {
   try {
-    start_app(token);
+    start_app();
   } catch(e) {
     console.error(e);
   }
 }).catch((err) => {
-  OAuth2.start_chrome_authorization().then((token) => {
-    start_app(token);
+  console.error(err);
+
+  OAuth2.start_chrome_authorization().then(() => {
+    start_app();
   }).catch((err) => {
     alert(err);
   });
