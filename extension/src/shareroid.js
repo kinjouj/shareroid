@@ -27,13 +27,12 @@ export default class Shareroid {
 
   read() {
     return new Promise((resolve, reject) => {
-      this.open().then((server) => {
-        (async () => {
-          let entries = await server.share.query().all().execute();
-          server.close();
-          resolve(entries);
-        })();
-      });
+      (async () => {
+        let server = await this.open();
+        let entries = await server.share.query().all().execute();
+        server.close();
+        resolve(entries);
+      })();
     });
   }
 
@@ -48,18 +47,17 @@ export default class Shareroid {
 
   sync() {
     return new Promise((resolve, reject) => {
-      let token = OAuth2.getAccessToken();
-
       request
         .get("https://shareroid.appspot.com/read/chrome")
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `Bearer ${OAuth2.getAccessToken()}`)
         .end((err, res) => {
           if (!res.ok) {
             reject(err);
             return;
           }
 
-          this.open().then((server) => {
+          (async () => {
+            let server = await this.open();
             res.body.forEach((v) => {
               server.share.add({ url: v.url }).then((entries) => {
                 entries.forEach((entry) => {
@@ -69,19 +67,18 @@ export default class Shareroid {
             });
             server.close();
 
-            (async () => {
-              let entries = await this.read();
-              resolve(entries.length);
-            })();
-          });
+            let entries = await this.read();
+            resolve(entries.length);
+          })();
         });
     });
   }
 
   clear() {
-    this.open().then((server) => {
+    (async () => {
+      let server = await this.open();
       server.share.clear();
       server.close();
-    });
+    })();
   }
 }

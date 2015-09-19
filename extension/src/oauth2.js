@@ -5,46 +5,47 @@ global.Promise = require("bluebird");
 
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
+const REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
 
 class AccessToken {
 
-  static getAccessToken() {
+  static get token() {
     return localStorage[ACCESS_TOKEN_KEY] || null;
   }
 
-  static saveAccessToken(access_token) {
-    return localStorage[ACCESS_TOKEN_KEY] = access_token;
+  static set token(token) {
+    return localStorage[ACCESS_TOKEN_KEY] = token;
   }
 
-  static getRefreshToken() {
+  static get refreshToken() {
     return localStorage[REFRESH_TOKEN_KEY] || null;
   }
 
-  static saveRefreshToken(refresh_token) {
-    return localStorage[REFRESH_TOKEN_KEY] = refresh_token;
+  static set refreshToken(token) {
+    return localStorage[REFRESH_TOKEN_KEY] = token;
   }
 
   static isPrivileged() {
-    return AccessToken.getAccessToken() !== null && AccessToken.getRefreshToken() !== null;
+    return AccessToken.token !== null && AccessToken.refreshToken !== null;
   }
 }
 
 export default class OAuth2 {
 
   static getAccessToken() {
-    return AccessToken.getAccessToken();
+    return AccessToken.token;
   }
 
   static authorize() {
     return new Promise((resolve, reject) => {
       OAuth2.check_token()
         .then(() => {
-          resolve(AccessToken.getAccessToken());
+          resolve(AccessToken.token);
         })
         .catch((err) => {
           OAuth2.refresh_access_token()
             .then(() => {
-              resolve(AccessToken.getAccessToken());
+              resolve(AccessToken.token);
             })
             .catch((err) => {
               reject(err);
@@ -60,7 +61,7 @@ export default class OAuth2 {
       }
 
       request
-        .get(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${AccessToken.getAccessToken()}`)
+        .get(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${AccessToken.token}`)
         .end((err, res) => {
           if (res.ok) {
             resolve();
@@ -81,7 +82,7 @@ export default class OAuth2 {
           client_secret: client_secret,
           code: code,
           grant_type: "authorization_code",
-          redirect_uri: "urn:ietf:wg:oauth:2.0:oob"
+          redirect_uri: REDIRECT_URI
         })
         .end((err, res) => {
           if (!res.ok) {
@@ -89,8 +90,8 @@ export default class OAuth2 {
           }
 
           var { access_token, refresh_token } = res.body;
-          AccessToken.saveAccessToken(access_token);
-          AccessToken.saveRefreshToken(refresh_token);
+          AccessToken.token = access_token;
+          AccessToken.refreshToken = refresh_token;
           resolve(access_token);
         });
     });
@@ -109,7 +110,7 @@ export default class OAuth2 {
           client_id: client_id,
           client_secret: client_secret,
           grant_type: "refresh_token",
-          refresh_token: AccessToken.getRefreshToken()
+          refresh_token: AccessToken.refreshToken
         })
         .end((err, res) => {
           if (!res.ok) {
@@ -118,8 +119,8 @@ export default class OAuth2 {
           }
 
           var { access_token } = res.body;
-          AccessToken.saveAccessToken(access_token);
-          resolve(AccessToken.getAccessToken());
+          AccessToken.token = access_token;
+          resolve(AccessToken.token);
         });
     });
   }
@@ -128,7 +129,7 @@ export default class OAuth2 {
     return new Promise((resolve) => {
       chrome.identity.launchWebAuthFlow(
         {
-          url: `https://accounts.google.com/o/oauth2/auth?client_id=${client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email`,
+          url: `https://accounts.google.com/o/oauth2/auth?client_id=${client_id}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email`,
           interactive: true
         },
         () => {

@@ -3,7 +3,7 @@ import Shareroid from "./shareroid";
 
 const SYNC_INTERVAL = 60;
 
-var cntObserve = Object.observe({ value: null }, (changes) => {
+var observer = Object.observe({ value: null }, (changes) => {
   changes.forEach((change) => {
     chrome.browserAction.setBadgeText({ text: String(change.object.value) });
   });
@@ -12,9 +12,8 @@ var cntObserve = Object.observe({ value: null }, (changes) => {
 function start_app(token) {
   let shareroid = new Shareroid();
   shareroid.sync().then((cnt) => {
-    cntObserve.value = cnt;
+    observer.value = cnt;
   });
-  shareroid.read();
 
   chrome.browserAction.onClicked.addListener(async () => {
     let entries = await shareroid.read();
@@ -23,13 +22,13 @@ function start_app(token) {
     });
 
     shareroid.clear();
-    cntObserve.value = 0;
+    observer.value = 0;
   });
 
   chrome.alarms.onAlarm.addListener((alarm) => {
     OAuth2.authorize().then((token) => {
       shareroid.sync().then((cnt) => {
-        cntObserve.value = cnt;
+        observer.value = cnt;
         (async () => {
           let entries = await shareroid.read();
           console.debug(entries);
